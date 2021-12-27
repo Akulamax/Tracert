@@ -3,7 +3,7 @@ import socket
 import struct
 import select
 
-def calculate_checksum(packet):#rfc1071
+def calculate_checksum(packet):#rfc1071 подсчет контрольной суммы
     checksum = 0
     overflow = 0
     for i in range(0, len(packet), 2):
@@ -24,13 +24,13 @@ def calculate_checksum(packet):#rfc1071
     return checksum
 
 def ping(ttl, destination_address, Socket):
-    timeout = 0.5
+    timeout = 0.5 #время ожидания ответа
     temp_header = struct.pack("bbHHh", 8, 0, 0,  0, 0)
     checksum = calculate_checksum(temp_header)
-    main_header = struct.pack("bbHHh", 8, 0, checksum, 0, 0)
+    main_header = struct.pack("bbHHh", 8, 0, checksum, 0, 0) 
     Socket.setsockopt(socket.SOL_IP, socket.IP_TTL, ttl)
-    Socket.sendto(main_header, (destination_address, 33434))
-    if select.select([Socket], [], [], timeout)[0] == []:
+    Socket.sendto(main_header, (destination_address, 33434)) #отправляем запрос
+    if select.select([Socket], [], [], timeout)[0] == []: #проверяем наличие ответа либо таймаут
         print(ttl, " The waiting interval for the request has been exceeded")
         return False
     IP = Socket.recvfrom(1024)[1][0]
